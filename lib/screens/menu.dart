@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:sylladex_mobile/widgets/left_drawer.dart';
+import 'package:sylladex_mobile/widgets/shop_card.dart';
 
 class MyHomePage extends StatelessWidget {
   MyHomePage({Key? key}) : super(key: key);
 
   final List<ShopItem> items = [
-    ShopItem("Lihat Item", Icons.checklist, Color(0xff7f5478)),
-    ShopItem("Tambah Item", Icons.add_shopping_cart, Color(0xff57b8a8)),
-    ShopItem("Logout", Icons.logout, Color(0xffebba55)),
+    ShopItem("Lihat Item", Icons.checklist, const Color(0xff7f5478)),
+    ShopItem("Tambah Item", Icons.add_shopping_cart, const Color(0xff57b8a8)),
+    ShopItem("Logout", Icons.logout, const Color(0xffebba55)),
   ];
 
   // This widget is the home page of your application. It is stateful, meaning
@@ -25,9 +27,10 @@ class MyHomePage extends StatelessWidget {
         title: const Text(
           'Sylladex Mobile',
         ),
-        backgroundColor: Color(0xff3e2f48), //added colour for appbar!
+        backgroundColor: const Color(0xff3e2f48), //added colour for appbar!
         foregroundColor: Colors.white,
       ),
+      drawer: const LeftDrawer(),
       body: SingleChildScrollView(
         // Widget wrapper yang dapat discroll
         child: Padding(
@@ -62,59 +65,6 @@ class MyHomePage extends StatelessWidget {
                 }).toList(),
               ),
             ],
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-class ShopItem {
-  final String name;
-  final IconData icon;
-  final Color color;
-
-  ShopItem(this.name, this.icon, this.color);
-}
-
-class ShopCard extends StatelessWidget {
-  final ShopItem item;
-
-  const ShopCard(this.item, {super.key}); // Constructor
-
-  @override
-  Widget build(BuildContext context) {
-    return Material(
-      color: item.color,
-      child: InkWell(
-        // Area responsive terhadap sentuhan
-        onTap: () {
-          // Memunculkan SnackBar ketika diklik
-          ScaffoldMessenger.of(context)
-            ..hideCurrentSnackBar()
-            ..showSnackBar(SnackBar(
-                content: Text("Kamu telah menekan tombol ${item.name}!")));
-        },
-        child: Container(
-          // Container untuk menyimpan Icon dan Text
-          padding: const EdgeInsets.all(8),
-          child: Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Icon(
-                  item.icon,
-                  color: Colors.white,
-                  size: 30.0,
-                ),
-                const Padding(padding: EdgeInsets.all(3)),
-                Text(
-                  item.name,
-                  textAlign: TextAlign.center,
-                  style: const TextStyle(color: Colors.white),
-                ),
-              ],
-            ),
           ),
         ),
       ),
