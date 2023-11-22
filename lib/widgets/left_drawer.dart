@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:sylladex_mobile/screens/list_product.dart';
 import 'package:sylladex_mobile/screens/menu.dart';
 import 'package:sylladex_mobile/screens/shoplist_form.dart';
 import 'package:sylladex_mobile/screens/lihat_item.dart';
@@ -58,11 +59,10 @@ class LeftDrawer extends StatelessWidget {
             title: const Text('Lihat Item'),
             // Bagian redirection ke ItemListPage
             onTap: () {
-              Navigator.pushReplacement(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => ItemListPage(),
-                  ));
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const ProductPage()),
+              );
             },
           ),
           ListTile(

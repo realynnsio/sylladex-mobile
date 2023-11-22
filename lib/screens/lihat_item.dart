@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:sylladex_mobile/models/product.dart';
 import 'package:sylladex_mobile/widgets/left_drawer.dart';
-import 'package:sylladex_mobile/widgets/item_card.dart';
+// import 'package:sylladex_mobile/widgets/item_card.dart';
 
 class ItemListPage extends StatelessWidget {
-  ItemListPage({Key? key}) : super(key: key);
+  final Product item;
+  const ItemListPage({Key? key, required this.item}) : super(key: key);
 
   // This class is the configuration for the state. It holds the values (in this
   // case the title) provided by the parent (in this case the App widget) and
@@ -13,51 +15,52 @@ class ItemListPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text(
-          'Sylladex Mobile',
+        appBar: AppBar(
+          leading: IconButton(
+            icon: Icon(Icons.arrow_back, color: Colors.white),
+            onPressed: () => Navigator.of(context).pop(),
+          ),
+          title: const Text(
+            'Item',
+          ),
+          backgroundColor: const Color(0xff3e2f48), //added colour for appbar!
+          foregroundColor: Colors.white,
         ),
-        backgroundColor: const Color(0xff3e2f48), //added colour for appbar!
-        foregroundColor: Colors.white,
-      ),
-      drawer: const LeftDrawer(),
-      body: SingleChildScrollView(
-        // Widget wrapper yang dapat discroll
-        child: Padding(
-          padding: const EdgeInsets.all(10.0), // Set padding dari halaman
-          child: Column(
-            // Widget untuk menampilkan children secara vertikal
-            children: <Widget>[
-              const Padding(
-                padding: EdgeInsets.only(top: 10.0, bottom: 10.0),
-                // Widget Text untuk menampilkan tulisan dengan alignment center dan style yang sesuai
-                child: Text(
-                  'Deck Inventory',
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    fontSize: 30,
-                    fontWeight: FontWeight.bold,
+        // drawer: const LeftDrawer(),
+        body: Material(
+          child: Card(
+            color: const Color(0xff7f5478),
+            clipBehavior: Clip.antiAlias,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(8.0), // Set border radius
+            ),
+            elevation: 5, // Add shadow elevation
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                ListTile(
+                  title: Text(
+                    item.fields.name,
+                    style: const TextStyle(color: Colors.white),
+                  ),
+                  subtitle: Text(
+                    'Amount: ${item.fields.amount}',
+                    style: TextStyle(color: Colors.white.withOpacity(0.6)),
                   ),
                 ),
-              ),
-              // Grid layout
-              GridView.count(
-                // Container pada card
-                primary: true,
-                padding: const EdgeInsets.all(20),
-                crossAxisSpacing: 10,
-                mainAxisSpacing: 10,
-                crossAxisCount: 3,
-                shrinkWrap: true,
-                children: Item.allItems.map((Item item) {
-                  // Iterasi untuk setiap item
-                  return ItemCard(item);
-                }).toList(),
-              ),
-            ],
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                  child: Container(
+                    alignment: Alignment.topLeft, // Align text to the left
+                    child: Text(
+                      item.fields.description,
+                      style: const TextStyle(color: Colors.white),
+                    ),
+                  ),
+                ),
+              ],
+            ),
           ),
-        ),
-      ),
-    );
+        ));
   }
 }

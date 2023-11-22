@@ -3,7 +3,156 @@
 
 **UPDATE: 15 Nov 2023. Jawaban Tugas 8 ditambahkan.**
 
+**UPDATE: 22 Nov 2023. Jawaban Tugas 9 ditambahkan.**
+
+
 Berikut jawaban README.md untuk tugas-tugas yang ada.
+
+<br>
+
+## TUGAS 9
+
+### QUESTION 1.
+Bisa, namun pendekatan ini tidak lebih baik daripada membuat model sebelum pengambilan data JSON. Saat menggunakan model, data akan menjadi lebih terstruktur dan lebih mudah untuk digunakan & diolah. Pengambilan data tanpa JSON tidak memiliki keuntungan ini, ia lebih rawan terhadap *human error* dalam penggunaannya.
+
+<br>
+
+### QUESTION 2.
+CookieRequest adalah bagian dari pbp_django_auth yang berfungsi untuk mendapatkan cookie yang dibuat pada awal sesi pengguna (saat user login). Ia perlu dibagikan ke semua komponen di aplikasi Flutter agar cookie yang ada dijaga tetap sinkron pada keseluruhan aplikasi untuk mempertahankan sesi pengguna.
+
+<br>
+
+### QUESTION 3.
+Sebelum mengambil data dari JSON, saya buat terlebih dahulu class Product dalam `product.dart` sebagai model untuk menyimpan data yang akan diambil. Method utama yang dipakai dari class Product ini untuk pengambilan data adalah kode berikut:
+
+```
+class Product {
+  ...
+
+  factory Product.fromJson(Map<String, dynamic> json) => Product(
+        model: json["model"],
+        pk: json["pk"],
+        fields: Fields.fromJson(json["fields"]),
+      );
+
+  ...
+}
+```
+
+Pengambilan data-nya sendiri dilakukan pada `list_product.dart` seperti berikut:
+
+```
+Future<List<Product>> fetchProduct() async {
+    var url =
+        Uri.parse('http://url-name/json-by-username/$username_global/');
+    var response = await http.get(
+      url,
+      headers: {"Content-Type": "application/json"},
+    );
+
+    // melakukan decode response menjadi bentuk json
+    var data = jsonDecode(utf8.decode(response.bodyBytes));
+
+    // melakukan konversi data json menjadi object Product
+    List<Product> list_product = [];
+    for (var d in data) {
+      if (d != null) {
+        list_product.add(Product.fromJson(d));
+      }
+    }
+    return list_product;
+  }
+```
+
+Setelah data diambil dan diconvert menjadi object dari class Product, objek-objek tersebut siap untuk digunakan dan ditampilkan pada aplikasi Flutter.
+
+<br>
+
+### QUESTION 4.
+Mekanisme autentikasi dari input data akun pada Flutter ke Django dimulai dari inisiasi CookieRequest baru sebagai berikut:
+
+```
+final request = context.watch<CookieRequest>();
+```
+
+Setelahnya, user log in dari Flutter melalui `login.dart` dan dihubungkan dengan proses authentication pada aplikasi Django:
+
+Kode login.dart di Flutter:
+```
+final response =
+    await request.login("http://127.0.0.1:8000/auth/login/", {
+  'username': username,
+  'password': password,
+});
+```
+
+Kode authentication/views.py di Django:
+
+```
+@csrf_exempt
+def login(request):
+    username = request.POST['username']
+    password = request.POST['password']
+    user = authenticate(username=username, password=password)
+    if user is not None:
+        if user.is_active:
+            auth_login(request, user)
+            # Status login sukses.
+            return JsonResponse({
+                "username": user.username,
+                "status": True,
+                "message": "Login sukses!",
+                # "user": user,
+                # Tambahkan data lainnya jika ingin mengirim data ke Flutter.
+            }, status=200)
+        else:
+            return JsonResponse({
+                "status": False,
+                "message": "Login gagal, akun dinonaktifkan."
+            }, status=401)
+
+    else:
+        return JsonResponse({
+            "status": False,
+            "message": "Login gagal, periksa kembali email atau kata sandi."
+        }, status=401)
+```
+
+Setelah user log in dan proses authentication selesai, user di-redirect ke tampilan menu pada flutter.
+
+<br>
+
+### QUESTION 5.
+##### Widget yang digunakan pada tugas ini:
+- **Text**: Sebuah widget yang menampilkan teks dengan suatu gaya tertentu
+- **TextField**: Sebuah widget yang memungkinkan pengguna untuk memasukkan teks dalam aplikasi Flutter
+- **ElevatedButton**: Sebuah widget yang membuat tombol dengan tampilan sedikit lebih tinggi (*elevated*) di aplikasi flutter
+- **SizedBox**: Sebuah widget yang membuat kotak dengan ukuran tertentu dalam aplikasi Flutter
+- **ListView**: Sebuah layout widget yang digunakan untuk menampilkan sejumlah widget yang bisa digulir secara vertikal atau horizontal
+
+<br>
+
+### QUESTION 6.
+##### Implementasi Checklist:
+- Pertama, saya membuat aplikasi `authentication` pada project Django yang pernah saya buat dan saya mengatur `settings.py` pada project saya agar authentication masuk dalam INSTALLED_APPS. Saya juga menambahkan hal-hal lainnya pada settings.py seperti corsheaders, middleware, dan variabel-variabel lainnya.
+- Menambahkan method login dan logout pada `authentication/views.py`, menambahkan routingnya kepada `authentication/urls.py` dan `sentimental_sylladex/urls.py`. 
+- Install package provider dan pbp_django_auth pada aplikasi flutter.
+- Menambahkan `Provider` pada main.dart, menghubungkan semua komponen aplikasi dengan `CookieRequest`.
+- Membuat screen `login.dart` pada folder screens.
+- Membuat model `product.dart` pada folder models sesuai dengan model yang digunakan pada project Django.
+- Membuat page `list_product.dart` yang mengimport data yang didapatkan dari https://url/json-by-username/$username_global/ dan menambahkan dependensi http.
+- Mengubah page `lihat_item.dart` agar menampilkan informasi khusus per-item dan menambahkan ElevatedButton pada list_product.dart agar bisa navigasi ke page tsb.
+- Menyesuaikan left drawer dan shop card yang ada agar bisa redirect ke page list_product.dart.
+- Menambahkan fungsi yang diperlukan pada app main dari project django, seperti method `show_json_by_username` pada `main/views.py`, menambahkan semua routing yang diperlukan.
+- Menambahkan fungsi `create_product_flutter` pada `main/views.py`, menambahkan semua routing yang diperlukan.
+- Merubah perintah onPressed pada shoplist_form.dart agar async dan terhubung dengan fungsi auth/login/ pada project Django.
+- Mengimplementasikan fitur logout.
+- **BONUS**: dikerjakan 1/2, hanya mengerjakan filter pada halaman daftar item dengan hanya menampilkan item yang terasosiasi dengan pengguna yang login.
+- Mengerjakan README.md.
+
+<br>
+<br>
+<br>
 
 ## TUGAS 8
 
